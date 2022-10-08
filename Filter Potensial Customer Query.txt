@@ -1,0 +1,87 @@
+# Menggabungkan Semua Tabel
+
+Select *
+From customer_data_history cdh
+join status_db s on cdh.idstatus = s.id
+join education_db e on cdh.educationid = e.id
+join category_db c on cdh.card_categoryid = c.id
+join marital_db m on cdh.maritalid = e.id
+
+
+# Jumlah Customer Berdasakan Level Pendidikan
+
+with a as(
+select s.status,
+       e.education_level,
+       cdh.clientnum
+from customer_data_history cdh
+join status_db s on cdh.idstatus = s.id
+join education_db e on cdh.educationid = e.id
+
+)
+
+select education_level,
+        count(case when status = 'Existing Customer' then status end) as Existing_Customer,
+        count(case when status = 'Attrited Customer' then status end) as Attrited_Customer,
+        count(clientnum) as Total_Customer,
+        round(CAST(count(case when status = 'Attrited Customer' then status end) AS DECIMAL (18,2)) / CAST(count(clientnum) AS DECIMAL (18,2))*100,2) as percentage_attired
+from a
+group by 1
+order by 1
+
+
+# Jumlah Customer Berdasakan Income Category
+with a as(
+select s.status,
+       cdh.income_category,
+       cdh.clientnum
+from customer_data_history cdh
+join status_db s on cdh.idstatus = s.id
+)
+
+select income_category,
+        count(case when status = 'Existing Customer' then status end) as Existing_Customer,
+        count(case when status = 'Attrited Customer' then status end) as Attrited_Customer,
+        count(clientnum) as Total_Customer,
+        round(CAST(count(case when status = 'Attrited Customer' then status end) AS DECIMAL (18,2)) / CAST(count(clientnum) AS DECIMAL (18,2))*100,2) as percentage_attired
+from a
+group by 1
+order by 1
+
+# Jumlah Customer Berdasakan Gender
+with a as(
+select s.status,
+       case when gender = 'F' then 'Female'
+       Else 'Male' end as gender,
+       cdh.clientnum
+from customer_data_history cdh
+join status_db s on cdh.idstatus = s.id
+)
+
+select gender,
+        count(case when status = 'Existing Customer' then status end) as Existing_Customer,
+        count(case when status = 'Attrited Customer' then status end) as Attrited_Customer,
+        count(clientnum) as Total_Customer,
+        round(CAST(count(case when status = 'Attrited Customer' then status end) AS DECIMAL (18,2)) / CAST(count(clientnum) AS DECIMAL (18,2))*100,2) as percentage_attired
+from a
+group by 1
+order by 1
+
+# Jumlah Customer Berdasakan Marital Status
+with a as(
+select s.status,
+       m.marital_status,
+       cdh.clientnum
+from customer_data_history cdh
+join status_db s on cdh.idstatus = s.id
+join marital_db m on cdh.maritalid = m.id
+)
+
+select marital_status,
+        count(case when status = 'Existing Customer' then status end) as Existing_Customer,
+        count(case when status = 'Attrited Customer' then status end) as Attrited_Customer,
+        count(clientnum) as Total_Customer,
+        round(CAST(count(case when status = 'Attrited Customer' then status end) AS DECIMAL (18,2)) / CAST(count(clientnum) AS DECIMAL (18,2))*100,2) as percentage_attired
+from a
+group by 1
+order by 1 desc
